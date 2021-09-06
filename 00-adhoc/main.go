@@ -23,7 +23,8 @@ Obviously there are a bunch of problems with this system:
 5. There's no way to reconfigure components live.
 6. It doesn't respond to signals (e.g. CTRL-C gracefully)
 
-Nevertheless, it demonstrates a minimal FBP approach in Go.
+It's probably much closer to CSP, but nevertheless, it demonstrates a good
+starting point for FBP.
 
 */
 
