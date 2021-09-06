@@ -61,7 +61,7 @@ type Hello struct {
 
 func (hello *Hello) Run(ctx context.Context) error {
 	defer close(hello.Out)
-	for i := 0; i < 10; i++ {
+	for i := 0; i < hello.Count; i++ {
 		select {
 		case <-ctx.Done():
 			return ctx.Err()

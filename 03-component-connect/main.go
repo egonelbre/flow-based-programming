@@ -47,7 +47,7 @@ type Hello struct {
 
 func (hello *Hello) Run() error {
 	defer close(hello.Out)
-	for i := 0; i < 10; i++ {
+	for i := 0; i < hello.Count; i++ {
 		hello.Out <- fmt.Sprintf("Hello %d", i)
 	}
 	return nil
