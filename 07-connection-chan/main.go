@@ -20,9 +20,10 @@ We'll start one which we can reconfigure while the network is running.
 
 We'll use a separate goroutine to pump messages from one channel to another.
 
-One of the concerns which such an approach is that hwat happens when a
-connection is cut while a message is in that "channel". For example the other
-node has stalled.
+One of the problems with this approach is that when a connection is disconnected
+while a message is in that "connection" it would either need to stall the disconnecting
+or drop the message. Dropping the message definitely seems like a bug, but so
+does stalling.
 */
 
 func main() {
@@ -111,8 +112,8 @@ func (conn *StringConnection) pump(out, in chan string) {
 			case val := <-out:
 				select {
 				case <-conn.stop:
-					// TODO: what should happen when the receiving component
-					// is not able to receive and you cut the connection?
+					// BUG: the message should be atomically moved from one
+					//      component to the other.
 					return
 				case in <- val:
 				}
