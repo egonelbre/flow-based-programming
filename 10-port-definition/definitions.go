@@ -6,8 +6,7 @@ import (
 )
 
 /*
-
-Here we'll look at different ways of writing ports.
+	Here we'll look at different ways of writing ports.
 */
 
 /*
