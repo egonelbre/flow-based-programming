@@ -2,10 +2,6 @@ package main
 
 import "fmt"
 
-func main() {
-	fmt.Println("hello")
-}
-
 /*
 	Here we'll look at different ways of writing a process.
 
