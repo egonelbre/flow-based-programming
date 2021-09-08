@@ -4,10 +4,10 @@ import "fmt"
 
 /*
 
-Here we'll look at different ways of writing components.
+	Here we'll look at different ways of writing components.
 
-We'll use `chan string` as the port, we'll look the connections
-in a separate folder.
+	We'll use `chan string` as the port, we'll look the connections
+	in a separate folder.
 
 */
 
@@ -29,7 +29,7 @@ func (printer *Printer) Execute() {
 }
 
 /*
-Then we could do the port lookup inside the component constructor:
+	Then we could do the port lookup inside the component constructor:
 */
 
 type Printer2 struct {
@@ -49,7 +49,7 @@ func (printer *Printer2) Execute(p *Process) {
 }
 
 /*
-Alternatively, it could be done as part of Execute:
+	Alternatively, it could be done as part of Execute:
 */
 
 type Printer3 struct {
@@ -65,9 +65,9 @@ func (printer *Printer3) Execute(p *Process) {
 }
 
 /*
-One common approach is to use closures to define functionality.
+	One common approach is to use closures to define functionality.
 
-This return the execute function.
+	This return the execute function.
 */
 
 func Printer4(p *Process) (execute func()) {
@@ -81,11 +81,11 @@ func Printer4(p *Process) (execute func()) {
 }
 
 /*
-Now via reflection it would also be possible to define components as functions
-and the ports as arguments.
+	Now via reflection it would also be possible to define components as functions
+	and the ports as arguments.
 
-One of the issues is that with reflection it's not possible to figure out the
-argument names.
+	One of the issues is that with reflection it's not possible to figure out the
+	argument names.
 */
 
 func Printer5(in <-chan string) {
@@ -95,11 +95,11 @@ func Printer5(in <-chan string) {
 }
 
 /*
-One option to capture the names is to use a struct instead.
+	One option to capture the names is to use a struct instead.
 
-Of course, both versions using reflection will have some overhead.
+	Of course, both versions using reflection will have some overhead.
 
-To gain persitence across runs it would either need to persist the arguments.
+	To gain persitence across runs it would either need to persist the arguments.
 */
 
 func Printer6(port *struct {
@@ -111,11 +111,11 @@ func Printer6(port *struct {
 }
 
 /*
-Although in principle it doesn't differ much from this definition
-that uses reflection to fill in the ports.
+	Although in principle it doesn't differ much from this definition
+	that uses reflection to fill in the ports.
 
-This version would be preferred over the previous ones, because it's slightly
-clearer how it works.
+	This version would be preferred over the previous ones, because it's slightly
+	clearer how it works.
 */
 
 type Printer7 struct {
@@ -128,11 +128,81 @@ func (p *Printer7) Execute() {
 	}
 }
 
+/*
+	It's also possible to treat components as just functionality and no state at all.
+
+	The first example uses a `map[string]string` to hang data to the process.
+	This is quite similar to
+*/
+
+func Printer8(p *Process) {
+	in := p.In("IN")
+	data := p.Data()
+	for value := range in {
+		data[value] = "found"
+	}
+}
+
+/*
+	It's also possible to treat components as just functionality and no state at all.
+
+	We could also use an approach similar to sync.Pool to persist data.
+*/
+
+func Printer9(p *Process) {
+	in := p.In("IN")
+
+	type Data struct {
+		Counter int
+	}
+
+	data := p.Data2("default", func() interface{} {
+		return &Data{}
+	}).(*Data)
+
+	for value := range in {
+		fmt.Println(value)
+		data.Counter++
+	}
+}
+
+/*
+	To prevent name collisions between components a tag type can be used instead
+	of a string.
+*/
+
+func Printer10(p *Process) {
+	in := p.In("IN")
+
+	type Tag struct{}
+	type Data struct {
+		Counter int
+	}
+	data := p.Data2(Tag{}, func() interface{} {
+		return &Data{}
+	}).(*Data)
+
+	for value := range in {
+		fmt.Println(value)
+		data.Counter++
+	}
+}
+
 /* stub to make compilation work */
 
 type Process struct{}
 
 func (p *Process) In(name string) <-chan string {
+	// TODO:
+	return nil
+}
+
+func (p *Process) Data() map[string]string {
+	// TODO:
+	return nil
+}
+
+func (p *Process) Data2(tag interface{}, create func() interface{}) interface{} {
 	// TODO:
 	return nil
 }
